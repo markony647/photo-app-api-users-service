@@ -2,7 +2,7 @@ package com.appsdeveloperblog.photoapp.api.users.users.ui.controllers;
 
 import com.appsdeveloperblog.photoapp.api.users.users.service.UsersService;
 import com.appsdeveloperblog.photoapp.api.users.users.shared.UserDto;
-import com.appsdeveloperblog.photoapp.api.users.users.ui.model.CreateUserReponseModel;
+import com.appsdeveloperblog.photoapp.api.users.users.ui.model.CreateUserResponseModel;
 import com.appsdeveloperblog.photoapp.api.users.users.ui.model.CreateUserRequestModel;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,8 +16,8 @@ import javax.validation.Valid;
 @RequestMapping("/users")
 public class UsersController {
 
-    private UsersService usersService;
-    private ModelMapper modelMapper;
+    private final UsersService usersService;
+    private final ModelMapper modelMapper;
 
     @Autowired
     public UsersController(UsersService usersService, ModelMapper modelMapper) {
@@ -31,10 +31,10 @@ public class UsersController {
     }
 
     @PostMapping
-    public ResponseEntity<CreateUserReponseModel> createUser(@Valid  @RequestBody CreateUserRequestModel userDetails) {
+    public ResponseEntity<CreateUserResponseModel> createUser(@Valid  @RequestBody CreateUserRequestModel userDetails) {
         UserDto userDto = modelMapper.map(userDetails, UserDto.class);
         UserDto createdUser = usersService.createUser(userDto);
-        CreateUserReponseModel returnValue = modelMapper.map(createdUser, CreateUserReponseModel.class);
+        CreateUserResponseModel returnValue = modelMapper.map(createdUser, CreateUserResponseModel.class);
         return ResponseEntity.status(HttpStatus.CREATED).body(returnValue);
     }
 
