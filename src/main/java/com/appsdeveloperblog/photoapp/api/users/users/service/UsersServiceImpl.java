@@ -14,11 +14,13 @@ import static org.modelmapper.convention.MatchingStrategies.STRICT;
 @Service
 public class UsersServiceImpl implements UsersService {
 
-    UsersRepository usersRepository;
+    private UsersRepository usersRepository;
+    private ModelMapper modelMapper;
 
     @Autowired
-    public UsersServiceImpl(UsersRepository usersRepository) {
+    public UsersServiceImpl(UsersRepository usersRepository, ModelMapper modelMapper) {
         this.usersRepository = usersRepository;
+        this.modelMapper = modelMapper;
     }
 
     @Override
