@@ -5,9 +5,13 @@ import com.appsdeveloperblog.photoapp.api.users.users.data.UsersRepository;
 import com.appsdeveloperblog.photoapp.api.users.users.shared.UserDto;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.userdetails.User;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.UUID;
 
 import static org.modelmapper.convention.MatchingStrategies.STRICT;
@@ -35,5 +39,17 @@ public class UsersServiceImpl implements UsersService {
         UserEntity userEntity = modelMapper.map(userDto, UserEntity.class);
         usersRepository.save(userEntity);
         return userDto;
+    }
+
+    @Override
+    public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
+        UserEntity userEntity = usersRepository.findByEmail(email);
+        if (userEntity == null) {
+            throw new UsernameNotFoundException(email);
+        }
+        return new User(userEntity.getEmail(),
+                userEntity.getEncryptedPassword(),
+                true, true,
+                true, true, new ArrayList<>());
     }
 }
