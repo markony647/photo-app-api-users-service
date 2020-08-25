@@ -3,6 +3,7 @@ package com.appsdeveloperblog.photoapp.api.users.users.security;
 import com.appsdeveloperblog.photoapp.api.users.users.service.UsersService;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.env.Environment;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -20,10 +21,12 @@ public class WebSecurity extends WebSecurityConfigurerAdapter {
 
     private UsersService usersService;
     private BCryptPasswordEncoder passwordEncoder;
+    private Environment env;
 
-    public WebSecurity(UsersService usersService, BCryptPasswordEncoder passwordEncoder) {
+    public WebSecurity(UsersService usersService, BCryptPasswordEncoder passwordEncoder, Environment env) {
         this.usersService = usersService;
         this.passwordEncoder = passwordEncoder;
+        this.env = env;
     }
 
     @Override
@@ -36,9 +39,7 @@ public class WebSecurity extends WebSecurityConfigurerAdapter {
     }
 
     private Filter getAuthenticationFilter() throws Exception {
-        AuthenticationFilter authenticationFilter = new AuthenticationFilter();
-        authenticationFilter.setAuthenticationManager(authenticationManager());
-        return authenticationFilter;
+        return new AuthenticationFilter(usersService, env, authenticationManager());
     }
 
     @Override
