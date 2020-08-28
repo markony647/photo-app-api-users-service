@@ -33,7 +33,7 @@ public class WebSecurity extends WebSecurityConfigurerAdapter {
     protected void configure(HttpSecurity http) throws Exception {
         http.csrf().disable();
         http.headers().frameOptions().disable(); // needed to make h2 console to work
-        http.authorizeRequests().antMatchers("/**").hasIpAddress(ip)
+        http.authorizeRequests().antMatchers("/users/**").permitAll()
                 .and()
                 .addFilter(getAuthenticationFilter());
     }
