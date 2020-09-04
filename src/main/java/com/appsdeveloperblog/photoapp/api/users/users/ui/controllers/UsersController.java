@@ -6,6 +6,7 @@ import com.appsdeveloperblog.photoapp.api.users.users.ui.model.CreateUserRespons
 import com.appsdeveloperblog.photoapp.api.users.users.ui.model.CreateUserRequestModel;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.env.Environment;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -18,16 +19,18 @@ public class UsersController {
 
     private final UsersService usersService;
     private final ModelMapper modelMapper;
+    private final Environment env;
 
     @Autowired
-    public UsersController(UsersService usersService, ModelMapper modelMapper) {
+    public UsersController(UsersService usersService, ModelMapper modelMapper, Environment env) {
         this.usersService = usersService;
         this.modelMapper = modelMapper;
+        this.env = env;
     }
 
     @GetMapping("/status/check")
     public String status() {
-        return "Working";
+        return "Working with the secret key " + env.getProperty("token.secret");
     }
 
     @PostMapping
