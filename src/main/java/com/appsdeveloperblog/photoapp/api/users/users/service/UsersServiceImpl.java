@@ -14,8 +14,6 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.UUID;
 
-import static org.modelmapper.convention.MatchingStrategies.STRICT;
-
 @Service
 public class UsersServiceImpl implements UsersService {
 
@@ -34,8 +32,6 @@ public class UsersServiceImpl implements UsersService {
     public UserDto createUser(UserDto userDto) {
         userDto.setUserId(UUID.randomUUID().toString());
         userDto.setEncryptedPassword(passwordEncoder.encode(userDto.getPassword()));
-        ModelMapper modelMapper = new ModelMapper();
-        modelMapper.getConfiguration().setMatchingStrategy(STRICT);
         UserEntity userEntity = modelMapper.map(userDto, UserEntity.class);
         usersRepository.save(userEntity);
         return userDto;
