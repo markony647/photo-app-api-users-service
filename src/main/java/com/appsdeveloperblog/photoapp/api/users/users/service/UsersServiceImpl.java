@@ -3,29 +3,42 @@ package com.appsdeveloperblog.photoapp.api.users.users.service;
 import com.appsdeveloperblog.photoapp.api.users.users.data.UserEntity;
 import com.appsdeveloperblog.photoapp.api.users.users.data.UsersRepository;
 import com.appsdeveloperblog.photoapp.api.users.users.shared.UserDto;
+import com.appsdeveloperblog.photoapp.api.users.users.ui.model.AlbumResponseModel;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.core.env.Environment;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 @Service
 public class UsersServiceImpl implements UsersService {
 
-    private UsersRepository usersRepository;
-    private ModelMapper modelMapper;
-    private BCryptPasswordEncoder passwordEncoder;
+    private final UsersRepository usersRepository;
+    private final ModelMapper modelMapper;
+    private final BCryptPasswordEncoder passwordEncoder;
+    private final RestTemplate restTemplate;
+    private final Environment env;
 
     @Autowired
-    public UsersServiceImpl(UsersRepository usersRepository, ModelMapper modelMapper, BCryptPasswordEncoder passwordEncoder) {
+    public UsersServiceImpl(UsersRepository usersRepository, ModelMapper modelMapper,
+                            BCryptPasswordEncoder passwordEncoder, RestTemplate restTemplate,
+                            Environment env) {
         this.usersRepository = usersRepository;
         this.modelMapper = modelMapper;
         this.passwordEncoder = passwordEncoder;
+        this.restTemplate = restTemplate;
+        this.env = env;
     }
 
     @Override
@@ -43,6 +56,22 @@ public class UsersServiceImpl implements UsersService {
         if (userEntity == null) {
             throw new UsernameNotFoundException(email);
         }
+        return modelMapper.map(userEntity, UserDto.class);
+    }
+
+    @Override
+    public UserDto getUserByUserId(String userId) {
+        String albumsUrl = String.format(env.getProperty("albums.url"), userId);
+
+        UserEntity userEntity = usersRepository.findByUserId(userId);
+        if (userEntity == null) {
+            throw new UsernameNotFoundException("User not found");
+        }
+        UserDto userDto = modelMapper.map(userEntity, UserDto.class);
+        ResponseEntity<List<AlbumResponseModel>> albumsListResponse = restTemplate.exchange(albumsUrl, HttpMethod.GET,
+                null, new ParameterizedTypeReference<>() {});
+        List<AlbumResponseModel> albumsList = albumsListResponse.getBody();
+        userDto.setAlbums(albumsList);
         return modelMapper.map(userEntity, UserDto.class);
     }
 
