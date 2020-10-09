@@ -44,10 +44,17 @@ public class UsersController {
 
     @GetMapping(value = "/{userId}")
     public ResponseEntity<UserResponseModel> getUser(@PathVariable("userId") String userId) {
-        UserDto userDto = usersService.getUserByUserId(userId);
+        UserDto userDto = usersService.getUserByUserIdUsingRestTemplate(userId);
         UserResponseModel returnValue = modelMapper.map(userDto, UserResponseModel.class);
 
         return ResponseEntity.status(HttpStatus.OK).body(returnValue);
     }
 
+    @GetMapping(value = "/{userId}/feign")
+    public ResponseEntity<UserResponseModel> getUserWithFeign(@PathVariable("userId") String userId) {
+        UserDto userDto = usersService.getUserByUserIdUsingFeign(userId);
+        UserResponseModel returnValue = modelMapper.map(userDto, UserResponseModel.class);
+
+        return ResponseEntity.status(HttpStatus.OK).body(returnValue);
+    }
 }

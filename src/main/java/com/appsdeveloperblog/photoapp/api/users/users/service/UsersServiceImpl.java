@@ -1,5 +1,6 @@
 package com.appsdeveloperblog.photoapp.api.users.users.service;
 
+import com.appsdeveloperblog.photoapp.api.users.users.data.AlbumsServiceClient;
 import com.appsdeveloperblog.photoapp.api.users.users.data.UserEntity;
 import com.appsdeveloperblog.photoapp.api.users.users.data.UsersRepository;
 import com.appsdeveloperblog.photoapp.api.users.users.shared.UserDto;
@@ -29,16 +30,18 @@ public class UsersServiceImpl implements UsersService {
     private final BCryptPasswordEncoder passwordEncoder;
     private final RestTemplate restTemplate;
     private final Environment env;
+    AlbumsServiceClient albumsServiceClient;
 
     @Autowired
     public UsersServiceImpl(UsersRepository usersRepository, ModelMapper modelMapper,
                             BCryptPasswordEncoder passwordEncoder, RestTemplate restTemplate,
-                            Environment env) {
+                            Environment env, AlbumsServiceClient albumsServiceClient) {
         this.usersRepository = usersRepository;
         this.modelMapper = modelMapper;
         this.passwordEncoder = passwordEncoder;
         this.restTemplate = restTemplate;
         this.env = env;
+        this.albumsServiceClient = albumsServiceClient;
     }
 
     @Override
@@ -60,7 +63,7 @@ public class UsersServiceImpl implements UsersService {
     }
 
     @Override
-    public UserDto getUserByUserId(String userId) {
+    public UserDto getUserByUserIdUsingRestTemplate(String userId) {
         String albumsUrl = String.format(env.getProperty("albums.url"), userId);
 
         UserEntity userEntity = usersRepository.findByUserId(userId);
@@ -72,6 +75,18 @@ public class UsersServiceImpl implements UsersService {
                 null, new ParameterizedTypeReference<>() {});
         List<AlbumResponseModel> albumsList = albumsListResponse.getBody();
         userDto.setAlbums(albumsList);
+        return userDto;
+    }
+
+    @Override
+    public UserDto getUserByUserIdUsingFeign(String userId) {
+        UserEntity userEntity = usersRepository.findByUserId(userId);
+        if (userEntity == null) {
+            throw new UsernameNotFoundException("User not found");
+        }
+        UserDto userDto = modelMapper.map(userEntity, UserDto.class);
+        List<AlbumResponseModel> albums = albumsServiceClient.getAlbums(userId);
+        userDto.setAlbums(albums);
         return userDto;
     }
 
