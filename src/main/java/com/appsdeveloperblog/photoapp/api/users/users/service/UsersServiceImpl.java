@@ -72,7 +72,7 @@ public class UsersServiceImpl implements UsersService {
                 null, new ParameterizedTypeReference<>() {});
         List<AlbumResponseModel> albumsList = albumsListResponse.getBody();
         userDto.setAlbums(albumsList);
-        return modelMapper.map(userEntity, UserDto.class);
+        return userDto;
     }
 
     @Override
