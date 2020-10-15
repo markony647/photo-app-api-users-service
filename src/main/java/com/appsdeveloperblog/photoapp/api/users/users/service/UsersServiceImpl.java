@@ -30,7 +30,7 @@ public class UsersServiceImpl implements UsersService {
     private final BCryptPasswordEncoder passwordEncoder;
     private final RestTemplate restTemplate;
     private final Environment env;
-    AlbumsServiceClient albumsServiceClient;
+    private final AlbumsServiceClient albumsServiceClient;
 
     @Autowired
     public UsersServiceImpl(UsersRepository usersRepository, ModelMapper modelMapper,

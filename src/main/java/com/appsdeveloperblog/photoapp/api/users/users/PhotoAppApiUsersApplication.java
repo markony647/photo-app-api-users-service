@@ -1,5 +1,6 @@
 package com.appsdeveloperblog.photoapp.api.users.users;
 
+import com.appsdeveloperblog.photoapp.api.users.users.shared.FeignErrorDecoder;
 import feign.Logger;
 import org.modelmapper.ModelMapper;
 import org.springframework.boot.SpringApplication;
@@ -43,6 +44,11 @@ public class PhotoAppApiUsersApplication {
     @Bean
     Logger.Level feignLoggerLevel() {
         return Logger.Level.FULL;
+    }
+
+    @Bean
+    public FeignErrorDecoder getFeignErrorDecoder() {
+        return new FeignErrorDecoder();
     }
 
 }
