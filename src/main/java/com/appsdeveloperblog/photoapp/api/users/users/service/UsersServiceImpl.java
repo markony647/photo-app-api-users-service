@@ -5,6 +5,7 @@ import com.appsdeveloperblog.photoapp.api.users.users.data.UserEntity;
 import com.appsdeveloperblog.photoapp.api.users.users.data.UsersRepository;
 import com.appsdeveloperblog.photoapp.api.users.users.shared.UserDto;
 import com.appsdeveloperblog.photoapp.api.users.users.ui.model.AlbumResponseModel;
+import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.ParameterizedTypeReference;
@@ -22,6 +23,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+@Slf4j
 @Service
 public class UsersServiceImpl implements UsersService {
 
@@ -85,7 +87,9 @@ public class UsersServiceImpl implements UsersService {
             throw new UsernameNotFoundException("User not found");
         }
         UserDto userDto = modelMapper.map(userEntity, UserDto.class);
+        log.info("======== Before calling albums microservice");
         List<AlbumResponseModel> albums = albumsServiceClient.getAlbums(userId);
+        log.info("======== After calling albums microservice");
         userDto.setAlbums(albums);
         return userDto;
     }
